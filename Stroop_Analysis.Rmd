@@ -1,0 +1,171 @@
+---
+title: "Stroop"
+output: html_document
+date: "2024-02-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Stroop Data Analysis
+
+**Research Question:**
+
+* Is there a cost of interference on the speed of processing?
+
+**Hypothesis:**
+
+* Responses in incongruent trials, where the word and ink color do not match, will be slower than responses for congruent tri
+
+Define some pretty colors
+
+```{r}
+colours <- hcl.colors(3, palette = "Zissou 1")
+```
+
+Load the data 
+
+```{r}
+stroopData <- read.csv("~/Downloads/StroopData.RData")
+```
+
+```{r}
+str(stroopData)
+```
+
+## Quality Assurance
+
+Get an overview of your data
+
+* Missing Values
+* Impossible Values
+* Number of participants
+* Number of congruent and incongruent trials
+* Incorrect trials
+
+## Exploratory Data Analysis
+
+Explore the distribution of interesting or relevant variables
+
+* Identify your outcome variable
+* Determine the central tendency of your outcome variable
+* Obtain a point estimate of the difference in the central tendency of your outcome across groups
+
+```{r}
+
+```
+
+
+## Analysis
+
+Use a permutation test to determine the statistical significance of the difference in response time between congruent and incongruent trials
+
+The permutation test procedure is as follows:
+
+* Combine the results from the different groups into a single data set
+* Shuffle the combined data and then randomly draw (without replacement) a resample of the same size as group A
+  + Sampling with replacement is a bootstrap permutation test
+* From the remaining data, draw (without replacement) a resample of the same size as group B
+  + Repeat if more groups
+* Calculate the same statistic you calculated for the original sample
+* Repeat these steps N times to yield a permutation distribution of the test statistic
+
+```{r}
+
+```
+
+## t-tests
+H0 : Ni difference between response times for congruent and incongruent trials
+H1: RT for incongruent trails are slower than congruent trials
+
+RTDifference = incongruent - congruent <- one tail test
+
+1 tail test 
+
+##Assumptions of t test
+1. Scale of Measurement
+2. Random Sampling
+3. Normality
+4. Large Sample
+5. Homogeneity of variance
+
+```{r}
+
+```
+
+###Normality
+```{r}
+qqnorm(stroopData1$RT[stroopData.Clean$Word.Color.Relationship == "Congruent"])
+qqline("")
+
+qqnorm(stroopData1$RT[stroopData.Clean$Word.Color.Relationship == "Incongruent"])
+qqline("")
+```
+
+
+```{r}
+shapiro.test(log(stroopData.Clean1$RT[stroopData.Clean1$Word.Color.Relationship == "Congruent"]))
+
+shapiro.test(log(stroopData.Clean1$RT[stroopData.Clean1$Word.Color.Relationship == "Incongruent"]))
+```
+
+
+##Homogenity of Variance
+```{r}
+car::leveneTest(stroopData.Clean1$RT,as.factor(stroopData.Clean1$Word.Color.Relationship))
+```
+
+### t-test
+
+```{r}
+dim(stroopData.Clean1)
+dim(stroopData)
+
+xtabs(~ ParticipantID + Word.Color.Relationship, data = stroopData.Clean1)
+```
+
+
+```{r}
+t.test(log(RT) ~ Word.Color Relationship, data = stroopData.Clean1, alernative = "less", var.equal = TRUE, paired = TRUE)
+```
+
+```{r}
+load("~/Downloads/StroopDataSubSampled.RData")
+```
+
+```{r}
+xtabs(~ ParticipantID + Word.Color.Relationship, data = subSampledStroop)
+```
+
+```{r}
+t.test(log(subSampledStroop$RT[subSampledStroop$Word.Color.Relationship == "Congruent"]) ~ Word.Color Relationship, data = stroopData.Clean1, alernative = "less", var.equal = TRUE)
+```
+
+
+##t-test by hand 
+
+```{r}
+subSampledStroop$RTlog <- log(subSampledStroop$RT)
+```
+
+
+```{r}
+tapply(log(subSampledStroop$RT), subSampledStroop$Word.Color.Relationship, FUN = mean)
+mDiff <- theMeans[2] - theMeans[1]
+
+cov12 <- cor(subSampledStroop$RT[subSampledStroop$Word.Color.Relationship == "Congruent"], subSampledStroop$RT[subSampledStroop$Word.Color.Relationship == "Incongruent"]) * sd(subSampledStroop$RT[subSampledStroop$Word.Color.Relationship == "Congruent"]) * sd(subSampledStroop$RT[subSampledStroop$Word.Color.Relationship == "Incongruent"])
+
+sdMeanDiff <- sqrt(var(subSampledStroop$RT[subSampledStroop$Word.Color.Relationship == "Congruent"]) + var(subSampledStroop$RT[subSampledStroop$Word.Color.Relationship == "Incongruent"])-(2*cov12)
+
+
+seMeanDiff <- sdMeanDiff/sqrt(10)                   
+                   
+tCalculate <- mDiff/seMeanDiff
+```
+
+
+
+
+
+
